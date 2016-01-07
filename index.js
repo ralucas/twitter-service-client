@@ -29,6 +29,7 @@ function TwitterService(config) {
 
 TwitterService.prototype.callRest = function(method, endpoint, params) {
   params = params || {};
+
   return Q.ninvoke(this.client, method, endpoint, params)
     .catch(function(err) {
       console.error('Twitter response error: ', err);
@@ -41,15 +42,14 @@ TwitterService.prototype.getStream = function(endpoint, params, callback, errorC
 
   return Q.ninvoke(this.client, 'stream', endpoint, params)
     .then(function handleStream(stream) {
-      stream.on('data', cb); 
+      stream.on('data', callback); 
       stream.on('error', errorCallback);
     });
-}
+};
 
 function createToken(key, secret) {
   var token = encodeURIComponent(key) + ':' +
     encodeURIComponent(secret);
-
   return new Buffer(token).toString('base64');
 }
 
