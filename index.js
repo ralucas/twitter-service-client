@@ -22,6 +22,7 @@ function TwitterService(config) {
       return getAccessToken(this.config); 
     } catch (ex) {
       console.error(new Error('Missing configuration necessary to create client'));
+      console.error(ex);
     }
   }
 }
@@ -34,6 +35,16 @@ TwitterService.prototype.callRest = function(method, endpoint, params) {
       throw new Error(err);
     });
 };
+
+TwitterService.prototype.getStream = function(endpoint, params, callback, errorCallback) {
+  params = params || {};
+
+  return Q.ninvoke(this.client, 'stream', endpoint, params)
+    .then(function handleStream(stream) {
+      stream.on('data', cb); 
+      stream.on('error', errorCallback);
+    });
+}
 
 function createToken(key, secret) {
   var token = encodeURIComponent(key) + ':' +
@@ -63,7 +74,6 @@ function getAccessToken(config) {
   return Q.ninvoke(request, 'post', params)
     .then(function(response) {
       var body = JSON.parse(response[0].body);
-      console.log('tokens', body);
       assign(config, body);
       return new TwitterService(options);
     })
@@ -78,9 +88,11 @@ exports.createTwitterClient = function createTwitterClient(config) {
       return getAccessToken(config);
     } catch (ex) {
       console.error('Exception creating twitter client:', ex);
+      throw new Error(ex);
     }
   } else {
-    return new TwitterService(config);    
+    var twitterClient = new TwitterService(config);
+    return Q(twitterClient);
   }
 };
 
