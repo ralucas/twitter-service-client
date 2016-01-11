@@ -8,7 +8,7 @@ function TwitterService(config) {
 
   if (this.config.client) {
     this.client = this.config.client;
-  } else if (this.config.access_token) {
+  } else if (this.config.bearer_token) {
     this.client = new Twitter(this.config);
   } else if (this.config.access_token_key &&
       this.config.access_token_secret) {
@@ -16,10 +16,11 @@ function TwitterService(config) {
       consumer_key: process.env.TWITTER_CONSUMER_KEY,
       consumer_secret: process.env.TWITTER_CONSUMER_SECRET,
     });
-    this.client = new Twitter(clientConfig);
+    console.log('twitterConfig', this.config);
+    this.client = new Twitter(this.config);
   } else {
     try {
-      return getAccessToken(this.config); 
+      return getAppOnlyClient(this.config); 
     } catch (ex) {
       console.error(new Error('Missing configuration necessary to create client'));
       console.error(ex);
@@ -27,10 +28,16 @@ function TwitterService(config) {
   }
 }
 
-TwitterService.prototype.callRest = function(method, endpoint, params) {
+TwitterService.prototype.callRest = function(method, endpoint, params, cb) {
   params = params || {};
 
   return Q.ninvoke(this.client, method, endpoint, params)
+    .then(function(response) {
+      return {
+        request: response[0],
+        raw: response[1]
+      };
+    })
     .catch(function(err) {
       console.error('Twitter response error: ', err);
       throw new Error(err);
@@ -53,7 +60,7 @@ function createToken(key, secret) {
   return new Buffer(token).toString('base64');
 }
 
-function getAccessToken(config) {
+function getAppOnlyClient(config) {
   if (!(config.consumer_key && config.consumer_secret)) {
     throw new Error('Config required');
   }
@@ -74,18 +81,49 @@ function getAccessToken(config) {
   return Q.ninvoke(request, 'post', params)
     .then(function(response) {
       var body = JSON.parse(response[0].body);
-      assign(config, body);
-      return new TwitterService(options);
+      console.log(body);
+      assign(config, { bearer_token: body.access_token });
+      return new TwitterService(config);
     })
     .catch(function(err) {
       console.error('Error in requesting twitter bearer token:', err, err.stack);
     });
 }
 
-exports.createTwitterClient = function createTwitterClient(config) {
+function invalidateToken(config) {
+  if (!(config.consumer_key && config.consumer_secret)) {
+    throw new Error('Config required');
+  }
+
+  var token = createToken(config.consumer_key, config.consumer_secret);
+ 
+  var params = {
+    url: 'https://api.twitter.com/oauth2/invalidate_token',
+    headers: {
+      'Authorization': 'Basic ' + token,
+      'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
+    },
+    form: {
+      'access_token': config.bearer_token || config.access_token
+    }
+  };
+
+  return Q.ninvoke(request, 'post', params)
+    .then(function(response) {
+      var body = JSON.parse(response[0].body);
+      assign(config, body);
+      return new TwitterService(config);
+    })
+    .catch(function(err) {
+      console.error('Error in requesting twitter bearer token:', err, err.stack);
+    });
+
+}
+
+TwitterService.prototype.createTwitterClient = function createTwitterClient(config) {
   if (!config.access_token_key && !config.access_token_secret) {
     try {
-      return getAccessToken(config);
+      return getAppOnlyClient(config);
     } catch (ex) {
       console.error('Exception creating twitter client:', ex);
       throw new Error(ex);
