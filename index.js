@@ -16,13 +16,13 @@ function TwitterService(config) {
       consumer_key: process.env.TWITTER_CONSUMER_KEY,
       consumer_secret: process.env.TWITTER_CONSUMER_SECRET,
     });
-    console.log('twitterConfig', this.config);
     this.client = new Twitter(this.config);
   } else {
     try {
       return getAppOnlyClient(this.config); 
     } catch (ex) {
-      console.error(new Error('Missing configuration necessary to create client'));
+      var error = new Error('Missing configuration necessary to create client');
+      console.error(error, error.message, error.stack);
       console.error(ex);
     }
   }
