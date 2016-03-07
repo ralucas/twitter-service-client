@@ -14,7 +14,7 @@ function TwitterService(config) {
       this.config.access_token_secret) {
     assign(this.config, {
       consumer_key: process.env.TWITTER_CONSUMER_KEY,
-      consumer_secret: process.env.TWITTER_CONSUMER_SECRET,
+      consumer_secret: process.env.TWITTER_CONSUMER_SECRET
     });
     this.client = new Twitter(this.config);
   } else {
