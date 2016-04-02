@@ -19,7 +19,7 @@ function TwitterService(config) {
     this.client = new Twitter(this.config);
   } else {
     try {
-      this.getAppOnlyClient(this.config); 
+      getAppOnlyClient(this.config); 
     } catch (ex) {
       var error = new Error('Missing configuration necessary to create client');
       console.error(error, error.message, error.stack);
@@ -60,12 +60,10 @@ function createToken(key, secret) {
   return new Buffer(token).toString('base64');
 }
 
-TwitterService.prototype.getAppOnlyClient = function getAppOnlyClient(config) {
+function getAppOnlyClient(config) {
   if (!(config.consumer_key && config.consumer_secret)) {
     throw new Error('Config required');
   }
-
-  var _this = this;
 
   var token = createToken(config.consumer_key, config.consumer_secret);
  
@@ -84,8 +82,8 @@ TwitterService.prototype.getAppOnlyClient = function getAppOnlyClient(config) {
     .then(function(response) {
       var body = JSON.parse(response[0].body);
       assign(config, { bearer_token: body.access_token });
-      _this.client = new Twitter(config);
-      return _this.client;
+      var client = new Twitter(config);
+      return new TwitterService({client: client});
     })
     .catch(function(err) {
       console.error('Error in requesting twitter bearer token:', err, err.stack);
