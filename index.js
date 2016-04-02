@@ -123,7 +123,7 @@ function invalidateToken(config) {
 TwitterService.prototype.createTwitterClient = function createTwitterClient(config) {
   if (!config.access_token_key && !config.access_token_secret) {
     try {
-      return this.getAppOnlyClient(config);
+      return getAppOnlyClient(config);
     } catch (ex) {
       console.error('Exception creating twitter client:', ex);
       throw new Error(ex);
