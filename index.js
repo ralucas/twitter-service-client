@@ -5,6 +5,8 @@ var assign = require('object-assign');
 
 function TwitterService(config) {
   this.config = config || {};
+  this.log = config.log || {};
+  this.logOutput = config.logOutput || console.log;
 
   if (this.config.client) {
     this.client = this.config.client;
@@ -30,7 +32,7 @@ function TwitterService(config) {
 
 TwitterService.prototype.callRest = function(method, endpoint, params, cb) {
   params = params || {};
-
+  this.logger(method, endpoint, params);
   return Q.ninvoke(this.client, method, endpoint, params)
     .then(function(response) {
       return {
@@ -42,6 +44,15 @@ TwitterService.prototype.callRest = function(method, endpoint, params, cb) {
       console.error('Twitter response error: ', err);
       throw new Error(err);
     });
+};
+
+TwitterService.prototype.logger = function logger(method, endpoint, params) {
+  this.log[method] = this.log[method] || {};
+  this.log[method][endpoint] = this.log[method][endpoint] || {};
+
+  this.log[method][endpoint].timestamp = new Date();
+  this.log[method][endpoint].params = params;
+  this.logOutput(this.log[method][endpoint]);
 };
 
 TwitterService.prototype.getStream = function(endpoint, params, callback, errorCallback) {
