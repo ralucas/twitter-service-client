@@ -48,11 +48,13 @@ TwitterService.prototype.callRest = function(method, endpoint, params, cb) {
 
 TwitterService.prototype.logger = function logger(method, endpoint, params) {
   this.log[method] = this.log[method] || {};
-  this.log[method][endpoint] = this.log[method][endpoint] || {};
+  this.log[method][endpoint] = this.log[method][endpoint] || [];
 
-  this.log[method][endpoint].timestamp = new Date();
-  this.log[method][endpoint].params = params;
-  this.logOutput(this.log[method][endpoint]);
+  this.log[method][endpoint].push({
+    timestamp: new Date(),
+    params: params
+  });
+  return this.logOutput(this.log[method][endpoint]);
 };
 
 TwitterService.prototype.getStream = function(endpoint, params, callback, errorCallback) {
