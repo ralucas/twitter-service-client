@@ -178,12 +178,10 @@ TwitterService.prototype.createInstance = function createInstance(config) {
  * @param {String} endpoint
  **/
 TwitterService.prototype.logger = function logger(method, endpoint) {
-  this.log[method] = this.log[method] || {};
-  this.log[method][endpoint] = this.log[method][endpoint] || [];
+  var key = method + ':' + endpoint;
+  this.log[key] = this.log[key] || [];
 
-  this.log[method][endpoint].push({
-    timestamp: new Date()
-  });
+  this.log[key].push(new Date());
   return this.logOutput(this.log);
 };
 
