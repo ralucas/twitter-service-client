@@ -40,6 +40,7 @@ TwitterService.prototype.callRest = function(method, endpoint, params, cb) {
   var _this = this;
 
   params = params || {};
+  method = method || 'get';
 
   if (!this.client) {
     // Create one and then call this again
@@ -182,7 +183,7 @@ TwitterService.prototype.logger = function logger(method, endpoint) {
   this.log[key] = this.log[key] || [];
 
   this.log[key].push(new Date());
-  return this.logOutput(this.log);
+  return this.logOutput('TwitterService log:', this.log);
 };
 
 // Creates a token for oauth token
