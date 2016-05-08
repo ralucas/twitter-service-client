@@ -10,14 +10,14 @@ function TwitterService(config) {
 
   if (this.config.client) {
     this.client = this.config.client;
-  } else if (this.config.bearer_token) {
+  } else if (this.config.bearer_token &&
+      this.config.consumer_key && 
+      this.config.consumer_secret) {
     this.client = new Twitter(this.config);
   } else if (this.config.access_token_key &&
-      this.config.access_token_secret) {
-    assign(this.config, {
-      consumer_key: process.env.TWITTER_CONSUMER_KEY,
-      consumer_secret: process.env.TWITTER_CONSUMER_SECRET
-    });
+      this.config.access_token_secret &&
+      this.config.consumer_key && 
+      this.config.consumer_secret) {
     this.client = new Twitter(this.config);
   } else {
     try {
