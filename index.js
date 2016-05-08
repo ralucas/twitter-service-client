@@ -183,6 +183,7 @@ TwitterService.prototype.logger = function logger(method, endpoint) {
   this.log[key] = this.log[key] || [];
 
   this.log[key].push(new Date());
+  this.log.len = this.log[key].length;
   return this.logOutput('TwitterService log:', this.log);
 };
 
