@@ -2,11 +2,19 @@ var Twitter = require('twitter');
 var request = require('request');
 var Q = require('q');
 var assign = require('object-assign');
+var EventEmitter = require('events');
 
 function TwitterService(config) {
   this.config = config || {};
-  this.log = config.log || {};
-  this.logOutput = config.logOutput || console.log;
+
+  if (this.config.monitor) {
+    this.log = config.log || {};
+    this.logOutput = config.logOutput || console.log;
+  }
+
+  if (this.config.events) {
+    this.emitter = new EventEmitter();
+  }
 
   if (this.config.client) {
     this.client = this.config.client;
@@ -50,6 +58,7 @@ TwitterService.prototype.callRest = function(method, endpoint, params, cb) {
   }
 
   this.logger(method, endpoint);
+  this.eventEmitter('rest_call_fired', {method: method, endpoint: endpoint});
 
   return Q.ninvoke(this.client, method, endpoint, params)
     .then(function(response) {
@@ -179,12 +188,20 @@ TwitterService.prototype.createInstance = function createInstance(config) {
  * @param {String} endpoint
  **/
 TwitterService.prototype.logger = function logger(method, endpoint) {
-  var key = method + ':' + endpoint;
-  this.log[key] = this.log[key] || [];
+  if (this.log) {
+    var key = method + ':' + endpoint;
+    this.log[key] = this.log[key] || [];
 
-  this.log[key].push(new Date());
-  this.log.len = this.log[key].length;
-  return this.logOutput('TwitterService log:', this.log);
+    this.log[key].push(new Date());
+    this.log.len = this.log[key].length;
+    return this.logOutput('TwitterService log:', this.log);
+  }
+};
+
+TwitterService.prototype.eventEmitter = function(evt, data) {
+  if (this.emitter) {
+    this.emitter.emit(evt, data);
+  }
 };
 
 // Creates a token for oauth token
