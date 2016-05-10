@@ -1,6 +1,6 @@
 {
   "name": "twitter-service-client",
-  "version": "0.0.13",
+  "version": "0.0.14",
   "description": "Abstraction for the twitter api",
   "main": "index.js",
   "scripts": {
