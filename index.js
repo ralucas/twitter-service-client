@@ -68,7 +68,7 @@ TwitterService.prototype.callRest = function(method, endpoint, params, cb) {
       };
     })
     .catch(function(err) {
-      var error = _this.errorParser(err);
+      var error = _this.errorParser(err, endpoint);
       console.error('Twitter response error: ', error.code, error.message);
       throw new Error(error);
     });
@@ -91,9 +91,11 @@ TwitterService.prototype.getStream = function(endpoint, params, callback, errorC
     });
 };
 
-TwitterService.prototype.errorParser = function errorParser(err) {
-  return err.shift();
-}
+TwitterService.prototype.errorParser = function errorParser(err, endpoint) {
+  var error = err.shift();
+  error.message = error.message + ' : ' + endpoint;
+  return error;
+};
 
 TwitterService.prototype.getAppOnlyClient = function getAppOnlyClient(config) {
   var _this = this;
