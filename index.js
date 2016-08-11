@@ -159,7 +159,7 @@ TwitterService.prototype.invalidateToken = function invalidateToken(config) {
       return new TwitterService(config);
     })
     .catch(function(err) {
-      console.error('Error in requesting twitter bearer token:', err, err.stack);
+      console.error('Error in invalidating twitter bearer token:', err, err.stack);
     });
 };
 
