@@ -3,6 +3,7 @@ var request = require('request');
 var Q = require('q');
 var assign = require('object-assign');
 var EventEmitter = require('events');
+var TwitterError = require('twitter-error');
 
 function TwitterService(config) {
   this.config = config || {};
@@ -31,7 +32,7 @@ function TwitterService(config) {
     try {
       this.getAppOnlyClient(this.config); 
     } catch (ex) {
-      var error = new Error('Missing configuration necessary to create client');
+      var error = new TwitterError('Missing configuration necessary to create client', 'none');
       console.error(error, error.message, error.stack);
       console.error(ex);
     }
@@ -70,7 +71,7 @@ TwitterService.prototype.callRest = function(method, endpoint, params, cb) {
     .catch(function(err) {
       var error = _this.errorParser(err, endpoint);
       console.error('Twitter response error: ', error.code, error.message);
-      throw new Error(error);
+      throw new TwitterError(error.message, error.code);
     });
 };
 
@@ -101,7 +102,7 @@ TwitterService.prototype.getAppOnlyClient = function getAppOnlyClient(config) {
   var _this = this;
 
   if (!(config.consumer_key && config.consumer_secret)) {
-    throw new Error('Config required');
+    throw new TwitterError('Config required', 'none');
   }
 
   var token = createToken(config.consumer_key, config.consumer_secret);
@@ -136,7 +137,7 @@ TwitterService.prototype.getAppOnlyClient = function getAppOnlyClient(config) {
  **/ 
 TwitterService.prototype.invalidateToken = function invalidateToken(config) {
   if (!(config.consumer_key && config.consumer_secret)) {
-    throw new Error('Config required');
+    throw new TwitterError('Config required', 'none');
   }
 
   var token = createToken(config.consumer_key, config.consumer_secret);
