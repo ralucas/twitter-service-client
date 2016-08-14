@@ -3,7 +3,7 @@ var request = require('request');
 var Q = require('q');
 var assign = require('object-assign');
 var EventEmitter = require('events');
-var TwitterError = require('twitter-error');
+var TwitterError = require('./twitter-error');
 
 function TwitterService(config) {
   this.config = config || {};
