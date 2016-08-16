@@ -1,10 +1,10 @@
 {
   "name": "twitter-service-client",
-  "version": "0.0.18",
+  "version": "0.0.19",
   "description": "Abstraction for the twitter api",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "./node_modules/.bin/mocha test"
   },
   "repository": {
     "type": "git",
@@ -20,9 +20,12 @@
   },
   "homepage": "https://github.com/ralucas/twitter-service-client",
   "dependencies": {
+    "chai": "^3.5.0",
+    "mocha": "^3.0.2",
     "object-assign": "^4.0.1",
     "q": "^1.4.1",
     "request": "^2.67.0",
+    "sinon": "^1.17.5",
     "twitter": "git://github.com/ralucas/node-twitter.git#master"
   }
 }

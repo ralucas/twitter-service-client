@@ -3,7 +3,7 @@ var request = require('request');
 var Q = require('q');
 var assign = require('object-assign');
 var EventEmitter = require('events');
-var TwitterError = require('./twitter-error');
+var TwitterError = require('./util/twitter-error');
 
 function TwitterService(config) {
   this.config = config || {};
@@ -29,13 +29,7 @@ function TwitterService(config) {
       this.config.consumer_secret) {
     this.client = new Twitter(this.config);
   } else {
-    try {
-      this.getAppOnlyClient(this.config); 
-    } catch (ex) {
-      var error = new TwitterError('Missing configuration necessary to create client', 'none');
-      console.error(error, error.message, error.stack);
-      console.error(ex);
-    }
+    this.getAppOnlyClient(this.config); 
   }
 }
 
@@ -93,7 +87,7 @@ TwitterService.prototype.getStream = function(endpoint, params, callback, errorC
 };
 
 TwitterService.prototype.errorParser = function errorParser(err, endpoint) {
-  var error = err.shift();
+  var error = err && err.shift();
   error.message = error.message + ' : ' + endpoint;
   return error;
 };
