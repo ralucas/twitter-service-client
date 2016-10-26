@@ -65,7 +65,7 @@ TwitterService.prototype.callRest = function(method, endpoint, params, cb) {
     .catch(function(err) {
       var error = _this.errorParser(err, endpoint);
       console.error('Twitter response error: ', error.code, error.message);
-      throw new TwitterError(error.message, error.code);
+      throw new TwitterError(error, params);
     });
 };
 
@@ -96,7 +96,7 @@ TwitterService.prototype.getAppOnlyClient = function getAppOnlyClient(config) {
   var _this = this;
 
   if (!(config.consumer_key && config.consumer_secret)) {
-    throw new TwitterError('Config required', 'none');
+    throw new TwitterError({message: 'Config required', code: 'none'});
   }
 
   var token = createToken(config.consumer_key, config.consumer_secret);
@@ -131,7 +131,7 @@ TwitterService.prototype.getAppOnlyClient = function getAppOnlyClient(config) {
  **/ 
 TwitterService.prototype.invalidateToken = function invalidateToken(config) {
   if (!(config.consumer_key && config.consumer_secret)) {
-    throw new TwitterError('Config required', 'none');
+    throw new TwitterError({message: 'Config required', code: 'none'});
   }
 
   var token = createToken(config.consumer_key, config.consumer_secret);

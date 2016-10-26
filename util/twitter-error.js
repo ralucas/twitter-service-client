@@ -1,7 +1,8 @@
-function TwitterError(message, code) {
+function TwitterError(error, params) {
     this.name = 'Twitter Error';
-    this.message = message;
-    this.code = code;
+    this.message = error.message + ' ' + JSON.stringify(params);
+    this.code = error.code;
+    this.params = params;
     this.stack = (new Error()).stack;
 }
 
