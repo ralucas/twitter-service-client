@@ -1,6 +1,6 @@
 {
   "name": "twitter-service-client",
-  "version": "0.0.20",
+  "version": "1.0.0",
   "description": "Abstraction for the twitter api",
   "main": "index.js",
   "scripts": {
@@ -26,6 +26,6 @@
     "q": "^1.4.1",
     "request": "^2.67.0",
     "sinon": "^1.17.5",
-    "twitter": "git://github.com/ralucas/node-twitter.git#master"
+    "twitter": "^1.7.0"
   }
 }
